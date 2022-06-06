@@ -14,7 +14,14 @@ function Login() {
       alert("아이디와 비밀번호를 입력해주세요!");
       return false;
     }
-    if (emailRef.current.value.includes("@") === false) {
+
+    if (
+      emailRef.current.value.includes("@") === false ||
+      emailRef.current.value.split("@")[0].length < 1 ||
+      emailRef.current.value.split("@")[1].includes(".") === false ||
+      emailRef.current.value.split("@")[1].split(".")[0].length < 1 ||
+      emailRef.current.value.split("@")[1].split(".")[1].length < 2
+    ) {
       alert("아이디는 이메일 형식입니다!");
       return false;
     }
@@ -33,7 +40,7 @@ function Login() {
     console.log(user);
 
     const user_docs = await getDocs(
-      query(collection(db, "users"), where("user_id", "==", user.user.email))
+      query(collection(db, "users"), where("userId", "==", user.user.email))
     );
     user_docs.forEach((u) => {
       console.log(u.data());
