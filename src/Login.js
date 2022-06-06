@@ -2,16 +2,33 @@ import React from "react";
 import { auth, db } from "./shared/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getDocs, where, query, collection } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const emailRef = React.useRef(null);
   const passwordRef = React.useRef(null);
+  const navigate = useNavigate();
 
   const loginFB = async () => {
+    if (emailRef.current.value === "" || passwordRef.current.value === "") {
+      alert("아이디와 비밀번호를 입력해주세요!");
+      return false;
+    }
+    if (emailRef.current.value.includes("@") === false) {
+      alert("아이디는 이메일 형식입니다!");
+      return false;
+    }
     const user = await signInWithEmailAndPassword(
       auth,
       emailRef.current.value,
       passwordRef.current.value
+    ).then(
+      function (value) {
+        navigate("/");
+      },
+      function (reason) {
+        alert("아이디와 비밀번호를 확인해주세요!");
+      }
     );
     console.log(user);
 

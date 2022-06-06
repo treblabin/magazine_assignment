@@ -22,7 +22,6 @@ function App() {
       document.getElementById("LogOut").style.display = "";
       document.getElementById("Signin").style.display = "none";
       document.getElementById("Login").style.display = "none";
-      alert("환영합니다!");
     } else {
       setIsLogin(false);
       document.getElementById("Signin").style.display = "";
