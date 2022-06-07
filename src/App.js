@@ -18,18 +18,8 @@ function App() {
   const loginCheck = async (user) => {
     if (user) {
       setIsLogin(true);
-      document.getElementById("Notification").style.display = "";
-      document.getElementById("LogOut").style.display = "";
-      document.getElementById("Signin").style.display = "none";
-      document.getElementById("Login").style.display = "none";
-      document.getElementById("toAdd").style.display = "";
     } else {
       setIsLogin(false);
-      document.getElementById("Signin").style.display = "";
-      document.getElementById("Login").style.display = "";
-      document.getElementById("Notification").style.display = "none";
-      document.getElementById("LogOut").style.display = "none";
-      document.getElementById("toAdd").style.display = "none";
     }
   };
 
@@ -62,7 +52,13 @@ function App() {
             display: "contents",
           }}
         >
-          <UpButton id="Login">로그인</UpButton>
+          <UpButton
+            style={{
+              display: is_login === false ? "" : "none",
+            }}
+          >
+            로그인
+          </UpButton>
         </Link>
         <Link
           to="/signup"
@@ -70,10 +66,18 @@ function App() {
             display: "contents",
           }}
         >
-          <UpButton id="Signin">회원가입</UpButton>
+          <UpButton
+            style={{
+              display: is_login === false ? "" : "none",
+            }}
+          >
+            회원가입
+          </UpButton>
         </Link>
         <UpButton
-          id="LogOut"
+          style={{
+            display: is_login === true ? "" : "none",
+          }}
           onClick={() => {
             signOut(auth);
             alert("로그아웃 되었습니다.");
@@ -94,7 +98,11 @@ function App() {
             display: "contents",
           }}
         >
-          <UpButton id="Notification">
+          <UpButton
+            style={{
+              display: is_login === true ? "" : "none",
+            }}
+          >
             <AiFillBell
               style={{
                 color: "white",

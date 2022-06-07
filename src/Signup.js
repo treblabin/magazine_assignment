@@ -108,7 +108,7 @@ function Signup() {
   return (
     <div>
       아이디(이메일) : <input type="text" ref={emailRef} /> <br />
-      닉네임 : <input type="text" id="nickname" ref={nicknameRef} />{" "}
+      닉네임 : <input type="text" id="nickname" ref={nicknameRef} />
       <button onClick={checkNickname} id="checkNickname">
         닉네임 중복체크
       </button>
@@ -118,7 +118,7 @@ function Signup() {
         style={{ display: "none" }}
       >
         닉네임 수정하기
-      </button>{" "}
+      </button>
       <br />
       비밀번호 : <input type="password" ref={passwordRef} /> <br />
       비밀번호 확인 : <input type="password" ref={passwordCheckRef} /> <br />
