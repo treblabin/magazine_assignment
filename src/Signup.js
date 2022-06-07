@@ -8,8 +8,15 @@ function Signup() {
   const emailRef = React.useRef(null);
   const passwordRef = React.useRef(null);
   const nicknameRef = React.useRef(null);
+  const passwordCheckRef = React.useRef(null);
 
   const navigate = useNavigate();
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      signupFB();
+    }
+  });
 
   const signupFB = async () => {
     if (
@@ -30,8 +37,16 @@ function Signup() {
       alert("아이디는 이메일 형태입니다!");
       return false;
     }
+    if (document.getElementById("nickname").readOnly === false) {
+      alert("닉네임 중복확인을 해주세요!");
+      return false;
+    }
     if (passwordRef.current.value.length < 6) {
       alert("비밀번호는 6자리 이상입니다!");
+      return false;
+    }
+    if (passwordRef.current.value !== passwordCheckRef.current.value) {
+      alert("비밀번호와 비밀번호 확인이 다릅니다!");
       return false;
     }
     const userID = emailRef.current.value;
@@ -50,7 +65,7 @@ function Signup() {
           alert("이미 사용 중인 이메일입니다!");
           return false;
         }
-        alert("알 수 없는 에러입니다. 관리자에게 문의해주세요.");
+        alert(error.code + "에러입니다. 관리자에게 문의해주세요.");
       });
 
     const user_doc = await addDoc(collection(db, "users"), {
@@ -72,13 +87,13 @@ function Signup() {
     ).then((user_docs) => {
       console.log(user_docs._snapshot.docChanges.length);
       if (user_docs._snapshot.docChanges.length === 0) {
-        alert("사용 가능한 아이디입니다!");
+        alert("사용 가능한 닉네임입니다!");
         document.getElementById("nickname").readOnly = true;
         document.getElementById("checkNickname").style.display = "none";
         document.getElementById("changeNickname").style.display = "";
         document.getElementById("nickname").style.background = "#ddd";
       } else {
-        alert("이미 사용 중인 아이디입니다!");
+        alert("이미 사용 중인 닉네임입니다!");
       }
     });
   };
@@ -106,6 +121,7 @@ function Signup() {
       </button>{" "}
       <br />
       비밀번호 : <input type="password" ref={passwordRef} /> <br />
+      비밀번호 확인 : <input type="password" ref={passwordCheckRef} /> <br />
       <button onClick={signupFB}>회원가입하기</button>
     </div>
   );

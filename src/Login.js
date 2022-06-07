@@ -9,6 +9,12 @@ function Login() {
   const passwordRef = React.useRef(null);
   const navigate = useNavigate();
 
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      loginFB();
+    }
+  });
+
   const loginFB = async () => {
     if (emailRef.current.value === "" || passwordRef.current.value === "") {
       alert("아이디와 비밀번호를 입력해주세요!");

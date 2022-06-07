@@ -22,12 +22,14 @@ function App() {
       document.getElementById("LogOut").style.display = "";
       document.getElementById("Signin").style.display = "none";
       document.getElementById("Login").style.display = "none";
+      document.getElementById("toAdd").style.display = "";
     } else {
       setIsLogin(false);
       document.getElementById("Signin").style.display = "";
       document.getElementById("Login").style.display = "";
       document.getElementById("Notification").style.display = "none";
       document.getElementById("LogOut").style.display = "none";
+      document.getElementById("toAdd").style.display = "none";
     }
   };
 
@@ -131,6 +133,7 @@ function App() {
           }}
         >
           <BiPlus
+            id="toAdd"
             style={{
               background: "deepskyblue",
               color: "white",
