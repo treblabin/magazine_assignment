@@ -5,6 +5,7 @@ import Main from "./Main";
 import Login from "./Login";
 import Add from "./Add";
 import Notification from "./Notification";
+import PleaseLogin from "./PleaseLogin";
 import { Routes, Route, Link } from "react-router-dom";
 import { auth } from "./shared/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -160,7 +161,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notification" element={<Notification />} />
-        <Route path="/add" element={<Add />} />
+        <Route path="/add" element={<Add is_login={is_login} />} />
+        <Route path="/pleaselogin" element={<PleaseLogin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

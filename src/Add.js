@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { storage } from "./shared/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
-function Add() {
+function Add(props) {
   const fileLinkRef = React.useRef(null);
   const [imageSrc, setImageSrc] = useState(
     "https://cdn.icon-icons.com/icons2/2348/PNG/512/image_picture_icon_143003.png"
@@ -12,6 +13,14 @@ function Add() {
   const [textState, setTextState] = useState("");
   const [radioState, setRadioState] = useState("left");
   const reader = new FileReader();
+
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!props.is_login) {
+      navigate("/pleaselogin");
+    }
+  }, [props.is_login]);
 
   const radioChange = (e) => {
     if (e.target.value === "left") {
@@ -64,11 +73,11 @@ function Add() {
             id="left"
             defaultChecked
           />
-          <label for="left">왼쪽</label>
+          <label htmlFor="left">왼쪽</label>
           <FullInput type="radio" name="sort" value="full" id="full" />
-          <label for="full">중앙</label>
+          <label htmlFor="full">중앙</label>
           <RightInput type="radio" name="sort" value="right" id="right" />
-          <label for="right">오른쪽</label>
+          <label htmlFor="right">오른쪽</label>
         </RadioCover>
         <PreviewCoverLeft
           style={{
