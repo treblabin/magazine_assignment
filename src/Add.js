@@ -93,7 +93,6 @@ function Add(props) {
       user_docs.forEach((doc) => {
         userNickname = doc.data().nickname;
       });
-      console.log(user_docs);
     });
 
     const myInput = {
@@ -107,6 +106,7 @@ function Add(props) {
       comments: [],
     };
     dispatch(createPostFB(myInput));
+    navigate("/");
   };
 
   return (
