@@ -161,7 +161,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notification" element={<Notification />} />
-        <Route path="/add" element={<Add is_login={is_login} />} />
+        <Route path="/add" element={<Add is_login={is_login} auth={auth} />} />
         <Route path="/pleaselogin" element={<PleaseLogin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

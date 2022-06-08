@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { storage } from "./shared/firebase";
+import { storage, db } from "./shared/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { createPostFB } from "./redux/modules/post";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
 
 function Add(props) {
   const fileLinkRef = React.useRef(null);
@@ -15,6 +18,7 @@ function Add(props) {
   const reader = new FileReader();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     if (!props.is_login) {
@@ -50,13 +54,59 @@ function Add(props) {
   };
 
   const uploadFB = async () => {
+    if (
+      textState === "" ||
+      imageSrc ===
+        "https://cdn.icon-icons.com/icons2/2348/PNG/512/image_picture_icon_143003.png"
+    ) {
+      alert("사진과 글을 올려주세요!");
+      return false;
+    }
+    let userNickname = "";
+    const today = new Date();
+    const time =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate() +
+      " " +
+      today.getHours() +
+      ":" +
+      today.getMinutes() +
+      ":" +
+      today.getSeconds();
     const uploadedFile = await uploadBytes(
-      ref(storage, `posts/132`),
+      ref(storage, `posts/${time}`),
       imageState
     );
     const fileUrl = await getDownloadURL(uploadedFile.ref);
     fileLinkRef.current = { url: fileUrl };
     console.log(fileLinkRef.current.url);
+
+    const userInfo = await getDocs(
+      query(
+        collection(db, "users"),
+        where("userId", "==", props.auth.currentUser.email)
+      )
+    ).then((user_docs) => {
+      user_docs.forEach((doc) => {
+        userNickname = doc.data().nickname;
+      });
+      console.log(user_docs);
+    });
+
+    const myInput = {
+      imageUrl: fileUrl,
+      imageStyle: radioState,
+      text: textState,
+      userEmail: props.auth.currentUser.email,
+      userNickname: userNickname,
+      time: time,
+      likes: [],
+      comments: [],
+    };
+    dispatch(createPostFB(myInput));
   };
 
   return (
