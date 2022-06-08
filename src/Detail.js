@@ -84,8 +84,8 @@ function Detail(props) {
           if (n.id === params.postId) {
             if (n.imageStyle === "left") {
               return (
-                <div>
-                  <PostCover key={n.id}>
+                <div key={n.id + "post"}>
+                  <PostCover>
                     <UserIdCover>
                       <UserImage src={userImageState[i]} />
                       <UserId>{n.userNickname}</UserId>
@@ -127,7 +127,7 @@ function Detail(props) {
                   </CommentCover>
                   {n.comments.map((c) => {
                     return (
-                      <div>
+                      <div key={n.id + "comment"}>
                         <CommentsCover>
                           <CommentNickname>{c.userNickname}</CommentNickname>
                           <CommentText>{c.text}</CommentText>
@@ -141,8 +141,8 @@ function Detail(props) {
             }
             if (n.imageStyle === "right") {
               return (
-                <div>
-                  <PostCover key={n.id}>
+                <div key={n.id + "post"}>
+                  <PostCover>
                     <UserIdCover>
                       <UserImage src={userImageState[i]} />
                       <UserId>{n.userNickname}</UserId>
@@ -184,7 +184,7 @@ function Detail(props) {
                   </CommentCover>
                   {n.comments.map((c) => {
                     return (
-                      <div>
+                      <div key={n.id + "comment"}>
                         <CommentsCover>
                           <CommentNickname>{c.userNickname}</CommentNickname>
                           <CommentText>{c.text}</CommentText>
@@ -198,8 +198,8 @@ function Detail(props) {
             }
             if (n.imageStyle === "full") {
               return (
-                <div>
-                  <PostCover key={n.id}>
+                <div key={n.id + "post"}>
+                  <PostCover>
                     <UserIdCover>
                       <UserImage src={userImageState[i]} />
                       <UserId>{n.userNickname}</UserId>
@@ -241,7 +241,7 @@ function Detail(props) {
                   </CommentCover>
                   {n.comments.map((c) => {
                     return (
-                      <div>
+                      <div key={n.id + "comment"}>
                         <CommentsCover>
                           <CommentNickname>{c.userNickname}</CommentNickname>
                           <CommentText>{c.text}</CommentText>
