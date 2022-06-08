@@ -10,10 +10,13 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { async } from "@firebase/util";
+import { act } from "react-dom/test-utils";
 
 // Actions
 const LOAD = "post/LOAD";
 const CREATE = "post/CREATE";
+const LIKE = "post/LIKE";
+const UNLIKE = "post/UNLIKE";
 
 const initialState = {
   list: [],
@@ -26,6 +29,14 @@ export function loadPost(post_list) {
 
 export function createPost(post) {
   return { type: CREATE, post };
+}
+
+export function likePost(post) {
+  return { type: LIKE, post };
+}
+
+export function unLikePost(post) {
+  return { type: UNLIKE, post };
 }
 
 //middlewares
@@ -59,6 +70,38 @@ export const createPostFB = (post) => {
   };
 };
 
+export const likePostFB = (post) => {
+  return async function (dispatch, getState) {
+    const postList = getState().post.list;
+    const postIndex = postList.findIndex((b) => {
+      return b.id === post.id;
+    });
+    const indexAndEmail = {
+      index: postIndex,
+      email: post.userEmail,
+    };
+    dispatch(likePost(indexAndEmail));
+    const docRef = doc(db, "post", post.id);
+    await updateDoc(docRef, { likes: getState().post.list[postIndex].likes });
+  };
+};
+
+export const unLikePostFB = (post) => {
+  return async function (dispatch, getState) {
+    const postList = getState().post.list;
+    const postIndex = postList.findIndex((b) => {
+      return b.id === post.id;
+    });
+    const indexAndEmail = {
+      index: postIndex,
+      email: post.userEmail,
+    };
+    dispatch(unLikePost(indexAndEmail));
+    const docRef = doc(db, "post", post.id);
+    await updateDoc(docRef, { likes: getState().post.list[postIndex].likes });
+  };
+};
+
 // Reducer
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
@@ -67,6 +110,25 @@ export default function reducer(state = initialState, action = {}) {
     }
     case "post/CREATE": {
       const new_post_list = [...state.list, action.post];
+      return { list: new_post_list };
+    }
+    case "post/LIKE": {
+      let temp_post_list = state.list;
+      temp_post_list[action.post.index].likes = [
+        ...state.list[action.post.index].likes,
+        action.post.email,
+      ];
+      const new_post_list = temp_post_list;
+      return { list: new_post_list };
+    }
+    case "post/UNLIKE": {
+      let temp_post_list = state.list;
+      temp_post_list[action.post.index].likes = state.list[
+        action.post.index
+      ].likes.filter((l) => {
+        return l !== action.post.email;
+      });
+      const new_post_list = temp_post_list;
       return { list: new_post_list };
     }
     // do reducer stuff

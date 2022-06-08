@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { loadPostFB } from "./redux/modules/post";
+import { loadPostFB, likePostFB, unLikePostFB } from "./redux/modules/post";
 import { collection, getDocs, where, query } from "firebase/firestore";
 import { async } from "@firebase/util";
 import { db } from "./shared/firebase";
+import { AiFillHeart } from "react-icons/ai";
 
-function Main() {
+function Main(props) {
   const dispatch = useDispatch();
 
   const data = useSelector((state) => state.post.list);
   const ReversedData = data.map((datas) => datas).reverse();
   const [userImageState, setUserImageState] = useState([]);
+
   const getUserImages = ReversedData.forEach(async (e) => {
     const temp_image = await getDocs(
       query(collection(db, "users"), where("userId", "==", e.userEmail))
@@ -26,16 +28,34 @@ function Main() {
     dispatch(loadPostFB());
   }, []);
 
+  const likePost = async (info) => {
+    if (!props.is_login) {
+      alert("좋아요를 위해서는 로그인을 해주세요!");
+      return false;
+    }
+    const likeInfo = {
+      id: info.id,
+      userEmail: props.auth.currentUser.email,
+    };
+    if (info.likes.includes(props.auth.currentUser.email)) {
+      dispatch(unLikePostFB(likeInfo));
+    } else {
+      dispatch(likePostFB(likeInfo));
+    }
+  };
+
   return (
     <div>
       <Cover>
         {ReversedData.map((n, i) => {
+          console.log(n.likes);
           if (n.imageStyle === "left") {
             return (
               <PostCover key={n.id}>
                 <UserIdCover>
                   <UserImage src={userImageState[i]} />
                   <UserId>{n.userNickname}</UserId>
+                  <WrittenDate>{n.time}</WrittenDate>
                 </UserIdCover>
                 <ImgLeft src={n.imageUrl} />
                 <TextCoverLeft>
@@ -43,6 +63,24 @@ function Main() {
                 </TextCoverLeft>
                 <Comments>댓글 {n.comments.length}개</Comments>
                 <Likes>좋아요 {n.likes.length}개</Likes>
+                <AiFillHeart
+                  onClick={() => {
+                    const info = { id: n.id, likes: n.likes };
+                    likePost(info);
+                  }}
+                  style={{
+                    position: "absolute",
+                    width: "20px",
+                    height: "20px",
+                    color: props.is_login
+                      ? n.likes.includes(props.auth.currentUser.email)
+                        ? "pink"
+                        : "gray"
+                      : "gray",
+                    bottom: "15px",
+                    right: "20px",
+                  }}
+                />
               </PostCover>
             );
           }
@@ -86,6 +124,12 @@ const UserImage = styled.img`
 
 const UserId = styled.p`
   margin-left: 20px;
+`;
+
+const WrittenDate = styled.p`
+  width: 200px;
+  text-align: right;
+  margin-left: auto;
 `;
 
 const ImgLeft = styled.img`
@@ -132,7 +176,7 @@ const Comments = styled.p`
 const Likes = styled.p`
   position: absolute;
   bottom: 0%;
-  right: 20px;
+  right: 50px;
 `;
 
 export default Main;

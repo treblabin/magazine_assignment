@@ -157,7 +157,7 @@ function App() {
         </Link>
       </div>
       <Routes>
-        <Route path="/" element={<Main />} />
+        <Route path="/" element={<Main is_login={is_login} auth={auth} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notification" element={<Notification />} />
