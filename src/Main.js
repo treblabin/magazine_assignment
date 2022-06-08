@@ -6,6 +6,7 @@ import { collection, getDocs, where, query } from "firebase/firestore";
 import { async } from "@firebase/util";
 import { db } from "./shared/firebase";
 import { AiFillHeart } from "react-icons/ai";
+import { Navigate, Link } from "react-router-dom";
 
 function Main(props) {
   const dispatch = useDispatch();
@@ -57,10 +58,101 @@ function Main(props) {
                   <UserId>{n.userNickname}</UserId>
                   <WrittenDate>{n.time}</WrittenDate>
                 </UserIdCover>
-                <ImgLeft src={n.imageUrl} />
+                <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
+                  <ImgLeft
+                    src={n.imageUrl}
+                    onClick={() => {
+                      Navigate("detail" + n.id);
+                    }}
+                  />
+                </Link>
                 <TextCoverLeft>
                   <TextLeft>{n.text}</TextLeft>
                 </TextCoverLeft>
+                <Comments>댓글 {n.comments.length}개</Comments>
+                <Likes>좋아요 {n.likes.length}개</Likes>
+                <AiFillHeart
+                  onClick={() => {
+                    const info = { id: n.id, likes: n.likes };
+                    likePost(info);
+                  }}
+                  style={{
+                    position: "absolute",
+                    width: "20px",
+                    height: "20px",
+                    color: props.is_login
+                      ? n.likes.includes(props.auth.currentUser.email)
+                        ? "pink"
+                        : "gray"
+                      : "gray",
+                    bottom: "15px",
+                    right: "20px",
+                  }}
+                />
+              </PostCover>
+            );
+          }
+          if (n.imageStyle === "right") {
+            return (
+              <PostCover key={n.id}>
+                <UserIdCover>
+                  <UserImage src={userImageState[i]} />
+                  <UserId>{n.userNickname}</UserId>
+                  <WrittenDate>{n.time}</WrittenDate>
+                </UserIdCover>
+                <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
+                  <ImgRight
+                    src={n.imageUrl}
+                    onClick={() => {
+                      Navigate("detail" + n.id);
+                    }}
+                  />
+                </Link>
+                <TextCoverRight>
+                  <TextRight>{n.text}</TextRight>
+                </TextCoverRight>
+                <Comments>댓글 {n.comments.length}개</Comments>
+                <Likes>좋아요 {n.likes.length}개</Likes>
+                <AiFillHeart
+                  onClick={() => {
+                    const info = { id: n.id, likes: n.likes };
+                    likePost(info);
+                  }}
+                  style={{
+                    position: "absolute",
+                    width: "20px",
+                    height: "20px",
+                    color: props.is_login
+                      ? n.likes.includes(props.auth.currentUser.email)
+                        ? "pink"
+                        : "gray"
+                      : "gray",
+                    bottom: "15px",
+                    right: "20px",
+                  }}
+                />
+              </PostCover>
+            );
+          }
+          if (n.imageStyle === "full") {
+            return (
+              <PostCover key={n.id}>
+                <UserIdCover>
+                  <UserImage src={userImageState[i]} />
+                  <UserId>{n.userNickname}</UserId>
+                  <WrittenDate>{n.time}</WrittenDate>
+                </UserIdCover>
+                <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
+                  <ImgFull
+                    src={n.imageUrl}
+                    onClick={() => {
+                      Navigate("detail" + n.id);
+                    }}
+                  />
+                </Link>
+                <TextCoverFull>
+                  <TextFull>{n.text}</TextFull>
+                </TextCoverFull>
                 <Comments>댓글 {n.comments.length}개</Comments>
                 <Likes>좋아요 {n.likes.length}개</Likes>
                 <AiFillHeart
@@ -164,6 +256,75 @@ const TextLeft = styled.p`
   white-space: pre-line;
   @media screen and (max-width: 500px) {
     width: calc((100% - 60px) / 2);
+  }
+`;
+
+const ImgRight = styled.img`
+  max-width: 200px;
+  max-height: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(0%, -50%);
+  @media screen and (max-width: 500px) {
+    max-width: calc((100vw - 60px) / 2);
+    max-height: calc((100vw - 60px));
+  }
+`;
+
+const TextCoverRight = styled.div`
+  width: 200px;
+  height: 400px;
+  @media screen and (max-width: 500px) {
+    width: calc((100% - 60px) / 2);
+    height: calc(100vw - 60px);
+  }
+`;
+
+const TextRight = styled.p`
+  width: 200px;
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(20px, -50%);
+  word-break: break-all;
+  white-space: pre-line;
+  @media screen and (max-width: 500px) {
+    width: calc((100% - 60px) / 2);
+  }
+`;
+
+const ImgFull = styled.img`
+  max-width: 300px;
+  max-height: 300px;
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  @media screen and (max-width: 500px) {
+    max-width: calc((100% - 100px) / 4 * 3);
+    max-height: calc((100vw - 100px) / 4 * 3);
+  }
+`;
+
+const TextCoverFull = styled.div`
+  width: 400px;
+  height: 100px;
+  @media screen and (max-width: 500px) {
+    width: calc(100% - 60px);
+  }
+`;
+
+const TextFull = styled.p`
+  width: 400px;
+  position: absolute;
+  bottom: 100px;
+  left: 0%;
+  transform: translate(20px, 100%);
+  word-break: break-all;
+  white-space: pre-line;
+  @media screen and (max-width: 500px) {
+    width: calc((100% - 60px));
   }
 `;
 

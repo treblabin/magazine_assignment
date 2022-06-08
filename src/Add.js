@@ -62,6 +62,7 @@ function Add(props) {
       alert("사진과 글을 올려주세요!");
       return false;
     }
+    document.getElementById("uploadBtn").disabled = true;
     let userNickname = "";
     const today = new Date();
     const time =
@@ -163,7 +164,9 @@ function Add(props) {
         텍스트 입력 (최대 100글자)
         <br />
         <TextInput maxLength={100} onChange={textPreview} /> <br />
-        <UploadBtn onClick={uploadFB}>포스트 업로드</UploadBtn>
+        <UploadBtn id="uploadBtn" onClick={uploadFB}>
+          포스트 업로드
+        </UploadBtn>
       </Cover>
     </FullCover>
   );
