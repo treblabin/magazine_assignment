@@ -10,11 +10,15 @@ import Detail from "./Detail";
 import { Routes, Route, Link } from "react-router-dom";
 import { auth } from "./shared/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { loadPostFB } from "./redux/modules/post";
 import styled from "styled-components";
 import { AiFillHome, AiFillBell, AiOutlineExport } from "react-icons/ai";
 import { BiPlus, BiChevronUp } from "react-icons/bi";
+import { useDispatch } from "react-redux";
 
 function App() {
+  const dispatch = useDispatch();
+
   const [is_login, setIsLogin] = React.useState(false);
 
   const loginCheck = async (user) => {
@@ -27,6 +31,7 @@ function App() {
 
   React.useEffect(() => {
     onAuthStateChanged(auth, loginCheck);
+    dispatch(loadPostFB());
   }, []);
 
   console.log(auth.currentUser);
@@ -163,7 +168,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/notification" element={<Notification />} />
         <Route path="/add" element={<Add is_login={is_login} auth={auth} />} />
-        <Route path="/detail/:postId" element={<Detail />} />
+        <Route
+          path="/detail/:postId"
+          element={<Detail is_login={is_login} auth={auth} />}
+        />
         <Route path="/pleaselogin" element={<PleaseLogin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

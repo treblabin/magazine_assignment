@@ -3,10 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { loadPostFB, likePostFB, unLikePostFB } from "./redux/modules/post";
 import { collection, getDocs, where, query } from "firebase/firestore";
-import { async } from "@firebase/util";
 import { db } from "./shared/firebase";
 import { AiFillHeart } from "react-icons/ai";
-import { Navigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Main(props) {
   const dispatch = useDispatch();
@@ -24,10 +23,6 @@ function Main(props) {
       });
     });
   });
-
-  React.useEffect(() => {
-    dispatch(loadPostFB());
-  }, []);
 
   const likePost = async (info) => {
     if (!props.is_login) {
@@ -49,7 +44,6 @@ function Main(props) {
     <div>
       <Cover>
         {ReversedData.map((n, i) => {
-          console.log(n.likes);
           if (n.imageStyle === "left") {
             return (
               <PostCover key={n.id}>
@@ -59,16 +53,13 @@ function Main(props) {
                   <WrittenDate>{n.time}</WrittenDate>
                 </UserIdCover>
                 <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
-                  <ImgLeft
-                    src={n.imageUrl}
-                    onClick={() => {
-                      Navigate("detail" + n.id);
-                    }}
-                  />
+                  <ImgLeft src={n.imageUrl} />
                 </Link>
-                <TextCoverLeft>
-                  <TextLeft>{n.text}</TextLeft>
-                </TextCoverLeft>
+                <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
+                  <TextCoverLeft>
+                    <TextLeft>{n.text}</TextLeft>
+                  </TextCoverLeft>
+                </Link>
                 <Comments>댓글 {n.comments.length}개</Comments>
                 <Likes>좋아요 {n.likes.length}개</Likes>
                 <AiFillHeart
@@ -101,16 +92,13 @@ function Main(props) {
                   <WrittenDate>{n.time}</WrittenDate>
                 </UserIdCover>
                 <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
-                  <ImgRight
-                    src={n.imageUrl}
-                    onClick={() => {
-                      Navigate("detail" + n.id);
-                    }}
-                  />
+                  <ImgRight src={n.imageUrl} />
                 </Link>
-                <TextCoverRight>
-                  <TextRight>{n.text}</TextRight>
-                </TextCoverRight>
+                <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
+                  <TextCoverRight>
+                    <TextRight>{n.text}</TextRight>
+                  </TextCoverRight>
+                </Link>
                 <Comments>댓글 {n.comments.length}개</Comments>
                 <Likes>좋아요 {n.likes.length}개</Likes>
                 <AiFillHeart
@@ -143,16 +131,13 @@ function Main(props) {
                   <WrittenDate>{n.time}</WrittenDate>
                 </UserIdCover>
                 <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
-                  <ImgFull
-                    src={n.imageUrl}
-                    onClick={() => {
-                      Navigate("detail" + n.id);
-                    }}
-                  />
+                  <ImgFull src={n.imageUrl} />
                 </Link>
-                <TextCoverFull>
-                  <TextFull>{n.text}</TextFull>
-                </TextCoverFull>
+                <Link to={`detail/${n.id}`} style={{ display: "contents" }}>
+                  <TextCoverFull>
+                    <TextFull>{n.text}</TextFull>
+                  </TextCoverFull>
+                </Link>
                 <Comments>댓글 {n.comments.length}개</Comments>
                 <Likes>좋아요 {n.likes.length}개</Likes>
                 <AiFillHeart
@@ -254,6 +239,7 @@ const TextLeft = styled.p`
   transform: translate(-20px, -50%);
   word-break: break-all;
   white-space: pre-line;
+  color: black;
   @media screen and (max-width: 500px) {
     width: calc((100% - 60px) / 2);
   }
@@ -289,6 +275,7 @@ const TextRight = styled.p`
   transform: translate(20px, -50%);
   word-break: break-all;
   white-space: pre-line;
+  color: black;
   @media screen and (max-width: 500px) {
     width: calc((100% - 60px) / 2);
   }
@@ -323,6 +310,7 @@ const TextFull = styled.p`
   transform: translate(20px, 100%);
   word-break: break-all;
   white-space: pre-line;
+  color: black;
   @media screen and (max-width: 500px) {
     width: calc((100% - 60px));
   }
