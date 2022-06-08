@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { loadPostFB, likePostFB, unLikePostFB } from "./redux/modules/post";
+import { likePostFB, unLikePostFB } from "./redux/modules/post";
 import { collection, getDocs, where, query } from "firebase/firestore";
 import { db } from "./shared/firebase";
 import { AiFillHeart } from "react-icons/ai";

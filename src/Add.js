@@ -83,7 +83,6 @@ function Add(props) {
     );
     const fileUrl = await getDownloadURL(uploadedFile.ref);
     fileLinkRef.current = { url: fileUrl };
-    console.log(fileLinkRef.current.url);
 
     const userInfo = await getDocs(
       query(

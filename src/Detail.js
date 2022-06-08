@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { likePostFB, unLikePostFB } from "./redux/modules/post";
+import { likePostFB, unLikePostFB, commentPostFB } from "./redux/modules/post";
 import { collection, getDocs, where, query } from "firebase/firestore";
 import { db } from "./shared/firebase";
 import { AiFillHeart } from "react-icons/ai";
 import { Link, useParams } from "react-router-dom";
+import { async } from "@firebase/util";
 
 function Detail(props) {
   const params = useParams();
   const dispatch = useDispatch();
-  console.log(params.postId);
+
+  const commentRef = React.useRef(null);
 
   const data = useSelector((state) => state.post.list);
   const ReversedData = data.map((datas) => datas).reverse();
@@ -42,6 +44,39 @@ function Detail(props) {
     }
   };
 
+  const postComment = async () => {
+    if (!props.is_login) {
+      alert("댓글 작성을 위해서는 로그인을 해주세요!");
+      return false;
+    }
+    if (commentRef.current.value === "") {
+      alert("댓글을 작성해주세요!");
+      return false;
+    }
+    const today = new Date();
+    const time =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate() +
+      " " +
+      today.getHours() +
+      ":" +
+      today.getMinutes() +
+      ":" +
+      today.getSeconds();
+
+    const commentInfo = {
+      id: params.postId,
+      userEmail: props.auth.currentUser.email,
+      text: commentRef.current.value,
+      time: time,
+    };
+    document.getElementById("commentInput").value = null;
+    dispatch(commentPostFB(commentInfo));
+  };
+
   return (
     <div>
       <Cover>
@@ -49,107 +84,173 @@ function Detail(props) {
           if (n.id === params.postId) {
             if (n.imageStyle === "left") {
               return (
-                <PostCover key={n.id}>
-                  <UserIdCover>
-                    <UserImage src={userImageState[i]} />
-                    <UserId>{n.userNickname}</UserId>
-                    <WrittenDate>{n.time}</WrittenDate>
-                  </UserIdCover>
-                  <ImgLeft src={n.imageUrl} />
-                  <TextCoverLeft>
-                    <TextLeft>{n.text}</TextLeft>
-                  </TextCoverLeft>
-                  <Comments>댓글 {n.comments.length}개</Comments>
-                  <Likes>좋아요 {n.likes.length}개</Likes>
-                  <AiFillHeart
-                    onClick={() => {
-                      const info = { id: n.id, likes: n.likes };
-                      likePost(info);
-                    }}
-                    style={{
-                      position: "absolute",
-                      width: "20px",
-                      height: "20px",
-                      color: props.is_login
-                        ? n.likes.includes(props.auth.currentUser.email)
-                          ? "pink"
-                          : "gray"
-                        : "gray",
-                      bottom: "15px",
-                      right: "20px",
-                    }}
-                  />
-                </PostCover>
+                <div>
+                  <PostCover key={n.id}>
+                    <UserIdCover>
+                      <UserImage src={userImageState[i]} />
+                      <UserId>{n.userNickname}</UserId>
+                      <WrittenDate>{n.time}</WrittenDate>
+                    </UserIdCover>
+                    <ImgLeft src={n.imageUrl} />
+                    <TextCoverLeft>
+                      <TextLeft>{n.text}</TextLeft>
+                    </TextCoverLeft>
+                    <Comments>댓글 {n.comments.length}개</Comments>
+                    <Likes>좋아요 {n.likes.length}개</Likes>
+                    <AiFillHeart
+                      onClick={() => {
+                        const info = { id: n.id, likes: n.likes };
+                        likePost(info);
+                      }}
+                      style={{
+                        position: "absolute",
+                        width: "20px",
+                        height: "20px",
+                        color: props.is_login
+                          ? n.likes.includes(props.auth.currentUser.email)
+                            ? "pink"
+                            : "gray"
+                          : "gray",
+                        bottom: "15px",
+                        right: "20px",
+                      }}
+                    />
+                  </PostCover>
+                  <CommentCover>
+                    <CommentInput
+                      type="text"
+                      maxLength="50"
+                      ref={commentRef}
+                      id="commentInput"
+                    />
+                    <CommentBtn onClick={postComment}>댓글달기</CommentBtn>
+                  </CommentCover>
+                  {n.comments.map((c) => {
+                    return (
+                      <div>
+                        <CommentsCover>
+                          <CommentNickname>{c.userNickname}</CommentNickname>
+                          <CommentText>{c.text}</CommentText>
+                        </CommentsCover>
+                        <CommentTime>{c.time}</CommentTime>
+                      </div>
+                    );
+                  })}
+                </div>
               );
             }
             if (n.imageStyle === "right") {
               return (
-                <PostCover key={n.id}>
-                  <UserIdCover>
-                    <UserImage src={userImageState[i]} />
-                    <UserId>{n.userNickname}</UserId>
-                    <WrittenDate>{n.time}</WrittenDate>
-                  </UserIdCover>
-                  <ImgRight src={n.imageUrl} />
-                  <TextCoverRight>
-                    <TextRight>{n.text}</TextRight>
-                  </TextCoverRight>
-                  <Comments>댓글 {n.comments.length}개</Comments>
-                  <Likes>좋아요 {n.likes.length}개</Likes>
-                  <AiFillHeart
-                    onClick={() => {
-                      const info = { id: n.id, likes: n.likes };
-                      likePost(info);
-                    }}
-                    style={{
-                      position: "absolute",
-                      width: "20px",
-                      height: "20px",
-                      color: props.is_login
-                        ? n.likes.includes(props.auth.currentUser.email)
-                          ? "pink"
-                          : "gray"
-                        : "gray",
-                      bottom: "15px",
-                      right: "20px",
-                    }}
-                  />
-                </PostCover>
+                <div>
+                  <PostCover key={n.id}>
+                    <UserIdCover>
+                      <UserImage src={userImageState[i]} />
+                      <UserId>{n.userNickname}</UserId>
+                      <WrittenDate>{n.time}</WrittenDate>
+                    </UserIdCover>
+                    <ImgRight src={n.imageUrl} />
+                    <TextCoverRight>
+                      <TextRight>{n.text}</TextRight>
+                    </TextCoverRight>
+                    <Comments>댓글 {n.comments.length}개</Comments>
+                    <Likes>좋아요 {n.likes.length}개</Likes>
+                    <AiFillHeart
+                      onClick={() => {
+                        const info = { id: n.id, likes: n.likes };
+                        likePost(info);
+                      }}
+                      style={{
+                        position: "absolute",
+                        width: "20px",
+                        height: "20px",
+                        color: props.is_login
+                          ? n.likes.includes(props.auth.currentUser.email)
+                            ? "pink"
+                            : "gray"
+                          : "gray",
+                        bottom: "15px",
+                        right: "20px",
+                      }}
+                    />
+                  </PostCover>
+                  <CommentCover>
+                    <CommentInput
+                      type="text"
+                      maxLength="50"
+                      ref={commentRef}
+                      id="commentInput"
+                    />
+                    <CommentBtn onClick={postComment}>댓글달기</CommentBtn>
+                  </CommentCover>
+                  {n.comments.map((c) => {
+                    return (
+                      <div>
+                        <CommentsCover>
+                          <CommentNickname>{c.userNickname}</CommentNickname>
+                          <CommentText>{c.text}</CommentText>
+                        </CommentsCover>
+                        <CommentTime>{c.time}</CommentTime>
+                      </div>
+                    );
+                  })}
+                </div>
               );
             }
             if (n.imageStyle === "full") {
               return (
-                <PostCover key={n.id}>
-                  <UserIdCover>
-                    <UserImage src={userImageState[i]} />
-                    <UserId>{n.userNickname}</UserId>
-                    <WrittenDate>{n.time}</WrittenDate>
-                  </UserIdCover>
-                  <ImgFull src={n.imageUrl} />
-                  <TextCoverFull>
-                    <TextFull>{n.text}</TextFull>
-                  </TextCoverFull>
-                  <Comments>댓글 {n.comments.length}개</Comments>
-                  <Likes>좋아요 {n.likes.length}개</Likes>
-                  <AiFillHeart
-                    onClick={() => {
-                      const info = { id: n.id, likes: n.likes };
-                      likePost(info);
-                    }}
-                    style={{
-                      position: "absolute",
-                      width: "20px",
-                      height: "20px",
-                      color: props.is_login
-                        ? n.likes.includes(props.auth.currentUser.email)
-                          ? "pink"
-                          : "gray"
-                        : "gray",
-                      bottom: "15px",
-                      right: "20px",
-                    }}
-                  />
-                </PostCover>
+                <div>
+                  <PostCover key={n.id}>
+                    <UserIdCover>
+                      <UserImage src={userImageState[i]} />
+                      <UserId>{n.userNickname}</UserId>
+                      <WrittenDate>{n.time}</WrittenDate>
+                    </UserIdCover>
+                    <ImgFull src={n.imageUrl} />
+                    <TextCoverFull>
+                      <TextFull>{n.text}</TextFull>
+                    </TextCoverFull>
+                    <Comments>댓글 {n.comments.length}개</Comments>
+                    <Likes>좋아요 {n.likes.length}개</Likes>
+                    <AiFillHeart
+                      onClick={() => {
+                        const info = { id: n.id, likes: n.likes };
+                        likePost(info);
+                      }}
+                      style={{
+                        position: "absolute",
+                        width: "20px",
+                        height: "20px",
+                        color: props.is_login
+                          ? n.likes.includes(props.auth.currentUser.email)
+                            ? "pink"
+                            : "gray"
+                          : "gray",
+                        bottom: "15px",
+                        right: "20px",
+                      }}
+                    />
+                  </PostCover>
+                  <CommentCover>
+                    <CommentInput
+                      type="text"
+                      maxLength="50"
+                      ref={commentRef}
+                      id="commentInput"
+                    />
+                    <CommentBtn onClick={postComment}>댓글달기</CommentBtn>
+                  </CommentCover>
+                  {n.comments.map((c) => {
+                    return (
+                      <div>
+                        <CommentsCover>
+                          <CommentNickname>{c.userNickname}</CommentNickname>
+                          <CommentText>{c.text}</CommentText>
+                        </CommentsCover>
+                        <CommentTime>{c.time}</CommentTime>
+                      </div>
+                    );
+                  })}
+                </div>
               );
             }
           }
@@ -318,6 +419,61 @@ const Likes = styled.p`
   position: absolute;
   bottom: 0%;
   right: 50px;
+`;
+
+const CommentCover = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 30px;
+`;
+
+const CommentInput = styled.input`
+  width: 300px;
+  height: 50px;
+  border-radius: 10px;
+  border: 2px solid deepskyblue;
+  outline-color: deepskyblue;
+  margin-right: 10px;
+  @media screen and (max-width: 500px) {
+    width: calc(100% - 80px);
+  }
+`;
+
+const CommentBtn = styled.button`
+  background-color: deepskyblue;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+`;
+
+const CommentsCover = styled.div`
+  width: 440px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 10px;
+  @media screen and (max-width: 500px) {
+    width: calc(100% - 20px);
+  }
+`;
+
+const CommentNickname = styled.p`
+  margin: 0px 20px 0px 20px;
+`;
+
+const CommentText = styled.p``;
+
+const CommentTime = styled.p`
+  margin: 0px 0px 0px 20px;
+  font-size: 10px;
+  float: left;
 `;
 
 export default Detail;

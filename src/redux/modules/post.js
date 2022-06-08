@@ -8,6 +8,8 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  where,
+  query,
 } from "firebase/firestore";
 import { async } from "@firebase/util";
 import { act } from "react-dom/test-utils";
@@ -17,6 +19,7 @@ const LOAD = "post/LOAD";
 const CREATE = "post/CREATE";
 const LIKE = "post/LIKE";
 const UNLIKE = "post/UNLIKE";
+const COMMENT = "post/COMMENT";
 
 const initialState = {
   list: [],
@@ -37,6 +40,10 @@ export function likePost(post) {
 
 export function unLikePost(post) {
   return { type: UNLIKE, post };
+}
+
+export function commentPost(commentInfo) {
+  return { type: COMMENT, commentInfo };
 }
 
 //middlewares
@@ -102,6 +109,38 @@ export const unLikePostFB = (post) => {
   };
 };
 
+export const commentPostFB = (commentInfo) => {
+  return async function (dispatch, getState) {
+    const postList = getState().post.list;
+    let userNickname = "";
+    const postIndex = postList.findIndex((b) => {
+      return b.id === commentInfo.id;
+    });
+    await getDocs(
+      query(
+        collection(db, "users"),
+        where("userId", "==", commentInfo.userEmail)
+      )
+    ).then((user_docs) => {
+      user_docs.forEach((doc) => {
+        userNickname = doc.data().nickname;
+      });
+    });
+    const newCommentInfo = {
+      index: postIndex,
+      userEmail: commentInfo.userEmail,
+      text: commentInfo.text,
+      time: commentInfo.time,
+      userNickname: userNickname,
+    };
+    dispatch(commentPost(newCommentInfo));
+    const docRef = doc(db, "post", commentInfo.id);
+    await updateDoc(docRef, {
+      comments: getState().post.list[postIndex].comments,
+    });
+  };
+};
+
 // Reducer
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
@@ -128,6 +167,18 @@ export default function reducer(state = initialState, action = {}) {
       ].likes.filter((l) => {
         return l !== action.post.email;
       });
+      const new_post_list = temp_post_list;
+      return { list: new_post_list };
+    }
+    case "post/COMMENT": {
+      let temp_post_list = state.list;
+      const newPush = {
+        userEmail: action.commentInfo.userEmail,
+        userNickname: action.commentInfo.userNickname,
+        text: action.commentInfo.text,
+        time: action.commentInfo.time,
+      };
+      temp_post_list[action.commentInfo.index].comments.push(newPush);
       const new_post_list = temp_post_list;
       return { list: new_post_list };
     }
