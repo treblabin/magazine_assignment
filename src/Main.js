@@ -22,6 +22,9 @@ function Main(props) {
         setUserImageState([...userImageState, doc.data().profilePic]);
       });
     });
+    if (userImageState.length === ReversedData.length) {
+      return false;
+    }
   });
 
   const likePost = async (info) => {
@@ -71,11 +74,12 @@ function Main(props) {
                     position: "absolute",
                     width: "20px",
                     height: "20px",
-                    color: props.is_login
-                      ? n.likes.includes(props.auth.currentUser.email)
-                        ? "pink"
-                        : "gray"
-                      : "gray",
+                    color:
+                      props.auth.currentUser !== null
+                        ? n.likes.includes(props.auth.currentUser.email)
+                          ? "pink"
+                          : "gray"
+                        : "gray",
                     bottom: "15px",
                     right: "20px",
                   }}
@@ -110,11 +114,12 @@ function Main(props) {
                     position: "absolute",
                     width: "20px",
                     height: "20px",
-                    color: props.is_login
-                      ? n.likes.includes(props.auth.currentUser.email)
-                        ? "pink"
-                        : "gray"
-                      : "gray",
+                    color:
+                      props.auth.currentUser !== null
+                        ? n.likes.includes(props.auth.currentUser.email)
+                          ? "pink"
+                          : "gray"
+                        : "gray",
                     bottom: "15px",
                     right: "20px",
                   }}
@@ -149,11 +154,12 @@ function Main(props) {
                     position: "absolute",
                     width: "20px",
                     height: "20px",
-                    color: props.is_login
-                      ? n.likes.includes(props.auth.currentUser.email)
-                        ? "pink"
-                        : "gray"
-                      : "gray",
+                    color:
+                      props.auth.currentUser !== null
+                        ? n.likes.includes(props.auth.currentUser.email)
+                          ? "pink"
+                          : "gray"
+                        : "gray",
                     bottom: "15px",
                     right: "20px",
                   }}

@@ -4,37 +4,26 @@ import { storage, db } from "./shared/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { createPostFB } from "./redux/modules/post";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
 
-function Add(props) {
-  const fileLinkRef = React.useRef(null);
-  const [imageSrc, setImageSrc] = useState(
-    "https://cdn.icon-icons.com/icons2/2348/PNG/512/image_picture_icon_143003.png"
-  );
-  const [imageState, setImageState] = useState(null);
-  const [textState, setTextState] = useState("");
-  const [radioState, setRadioState] = useState("left");
-
-  const reader = new FileReader();
-
+function Edit(props) {
+  const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const userCheck1 = () => {
-    if (props.auth.currentUser.email === null) {
-      console.log("here");
-      navigate("/pleaselogin");
-    }
-  };
+  const data = useSelector((state) => state.post.list);
+  console.log(data);
 
-  const userCheck = async () => {
-    await userCheck1();
-  };
+  const [textState, setTextState] = useState("");
+  const [radioState, setRadioState] = useState("");
 
   React.useEffect(() => {
-    userCheck();
-  }, []);
+    if (props.auth.currentUser === null) {
+      navigate("/");
+      alert("잘못된 접근입니다!");
+    }
+  }, [props.auth.currentUser]);
 
   const radioChange = (e) => {
     if (e.target.value === "left") {
@@ -48,135 +37,87 @@ function Add(props) {
     }
   };
 
-  const preview = (e) => {
-    setImageState(e.target.files[0]);
-    reader.readAsDataURL(e.target.files[0]);
-    return new Promise((resolve) => {
-      reader.onload = () => {
-        setImageSrc(reader.result);
-        resolve();
-      };
-    });
-  };
-
   const textPreview = (e) => {
     setTextState(e.target.value);
   };
 
-  const uploadFB = async () => {
-    if (
-      textState === "" ||
-      imageSrc ===
-        "https://cdn.icon-icons.com/icons2/2348/PNG/512/image_picture_icon_143003.png"
-    ) {
-      alert("사진과 글을 올려주세요!");
-      return false;
-    }
-    document.getElementById("uploadBtn").disabled = true;
-    let userNickname = "";
-    const today = new Date();
-    const time =
-      today.getFullYear() +
-      "-" +
-      (today.getMonth() + 1) +
-      "-" +
-      today.getDate() +
-      " " +
-      today.getHours() +
-      ":" +
-      today.getMinutes() +
-      ":" +
-      today.getSeconds();
-    const uploadedFile = await uploadBytes(
-      ref(storage, `posts/${time}`),
-      imageState
-    );
-    const fileUrl = await getDownloadURL(uploadedFile.ref);
-    fileLinkRef.current = { url: fileUrl };
-
-    const userInfo = await getDocs(
-      query(
-        collection(db, "users"),
-        where("userId", "==", props.auth.currentUser.email)
-      )
-    ).then((user_docs) => {
-      user_docs.forEach((doc) => {
-        userNickname = doc.data().nickname;
-      });
-    });
-
-    const myInput = {
-      imageUrl: fileUrl,
-      imageStyle: radioState,
-      text: textState,
-      userEmail: props.auth.currentUser.email,
-      userNickname: userNickname,
-      time: time,
-      likes: [],
-      comments: [],
-    };
-    dispatch(createPostFB(myInput));
-    navigate("/");
-  };
-
   return (
     <FullCover>
-      <Cover>
-        이미지 선택: <input type="file" accept="image/*" onChange={preview} />
-        <br />
-        <RadioCover onChange={radioChange}>
-          이미지 위치:
-          <LeftInput
-            type="radio"
-            name="sort"
-            value="left"
-            id="left"
-            defaultChecked
-          />
-          <label htmlFor="left">왼쪽</label>
-          <FullInput type="radio" name="sort" value="full" id="full" />
-          <label htmlFor="full">중앙</label>
-          <RightInput type="radio" name="sort" value="right" id="right" />
-          <label htmlFor="right">오른쪽</label>
-        </RadioCover>
-        <PreviewCoverLeft
-          style={{
-            display: radioState === "left" ? "" : "none",
-          }}
-        >
-          <PreviewImgLeft id="previewImg" src={imageSrc} />
-          <PreviewTextCoverLeft>
-            <PreviewTextLeft>{textState}</PreviewTextLeft>
-          </PreviewTextCoverLeft>
-        </PreviewCoverLeft>
-        <PreviewCoverRight
-          style={{
-            display: radioState === "right" ? "" : "none",
-          }}
-        >
-          <PreviewTextCoverRight>
-            <PreviewTextRight>{textState}</PreviewTextRight>
-          </PreviewTextCoverRight>
-          <PreviewImgRight id="previewImg" src={imageSrc} />
-        </PreviewCoverRight>
-        <PreviewCoverFull
-          style={{
-            display: radioState === "full" ? "" : "none",
-          }}
-        >
-          <PreviewImgFull id="previewImg" src={imageSrc} />
-          <PreviewTextCoverFull>
-            <PreviewTextFull>{textState}</PreviewTextFull>
-          </PreviewTextCoverFull>
-        </PreviewCoverFull>
-        <br />
-        텍스트 입력 (최대 100글자)
-        <br />
-        <TextInput maxLength={100} onChange={textPreview} /> <br />
-        <UploadBtn id="uploadBtn" onClick={uploadFB}>
-          포스트 업로드
-        </UploadBtn>
-      </Cover>
+      {data.map((n, i) => {
+        if (n.id === params.postId) {
+          return (
+            <Cover key={i}>
+              <RadioCover onChange={radioChange}>
+                이미지 위치:
+                <LeftInput
+                  type="radio"
+                  name="sort"
+                  value="left"
+                  id="left"
+                  defaultChecked={n.imageStyle === "left" ? true : false}
+                />
+                <label htmlFor="left">왼쪽</label>
+                <FullInput
+                  type="radio"
+                  name="sort"
+                  value="full"
+                  id="full"
+                  defaultChecked={n.imageStyle === "full" ? true : false}
+                />
+                <label htmlFor="full">중앙</label>
+                <RightInput
+                  type="radio"
+                  name="sort"
+                  value="right"
+                  id="right"
+                  defaultChecked={n.imageStyle === "right" ? true : false}
+                />
+                <label htmlFor="right">오른쪽</label>
+              </RadioCover>
+              <PreviewCoverLeft
+                style={{
+                  display: n.imageStyle === "left" ? "" : "none",
+                }}
+              >
+                <PreviewImgLeft id="previewImg" src={n.imageUrl} />
+                <PreviewTextCoverLeft>
+                  <PreviewTextLeft>{n.text}</PreviewTextLeft>
+                </PreviewTextCoverLeft>
+              </PreviewCoverLeft>
+              <PreviewCoverRight
+                style={{
+                  display: n.imageStyle === "right" ? "" : "none",
+                }}
+              >
+                <PreviewTextCoverRight>
+                  <PreviewTextRight>{n.text}</PreviewTextRight>
+                </PreviewTextCoverRight>
+                <PreviewImgRight id="previewImg" src={n.imageUrl} />
+              </PreviewCoverRight>
+              <PreviewCoverFull
+                style={{
+                  display: n.imageStyle === "full" ? "" : "none",
+                }}
+              >
+                <PreviewImgFull id="previewImg" src={n.imageUrl} />
+                <PreviewTextCoverFull>
+                  <PreviewTextFull>{n.text}</PreviewTextFull>
+                </PreviewTextCoverFull>
+              </PreviewCoverFull>
+              <br />
+              텍스트 입력 (최대 100글자)
+              <br />
+              <TextInput
+                maxLength={100}
+                onChange={textPreview}
+                defaultValue={n.text}
+              />{" "}
+              <br />
+              <UploadBtn id="uploadBtn">포스트 수정</UploadBtn>
+            </Cover>
+          );
+        }
+      })}
     </FullCover>
   );
 }
@@ -374,4 +315,4 @@ const UploadBtn = styled.button`
   font-size: 18px;
 `;
 
-export default Add;
+export default Edit;

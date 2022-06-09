@@ -7,6 +7,7 @@ import Add from "./Add";
 import Notification from "./Notification";
 import PleaseLogin from "./PleaseLogin";
 import Detail from "./Detail";
+import Edit from "./Edit";
 import { Routes, Route, Link } from "react-router-dom";
 import { auth } from "./shared/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -34,7 +35,6 @@ function App() {
     dispatch(loadPostFB());
   }, []);
 
-  console.log(auth.currentUser);
   return (
     <div className="App">
       <div>
@@ -171,6 +171,10 @@ function App() {
         <Route
           path="/detail/:postId"
           element={<Detail is_login={is_login} auth={auth} />}
+        />
+        <Route
+          path="/edit/:postId"
+          element={<Edit is_login={is_login} auth={auth} />}
         />
         <Route path="/pleaselogin" element={<PleaseLogin />} />
         <Route path="*" element={<NotFound />} />

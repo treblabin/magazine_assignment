@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { likePostFB, unLikePostFB, commentPostFB } from "./redux/modules/post";
+import {
+  likePostFB,
+  unLikePostFB,
+  commentPostFB,
+  deletePostFB,
+} from "./redux/modules/post";
 import { collection, getDocs, where, query } from "firebase/firestore";
 import { db } from "./shared/firebase";
 import { AiFillHeart } from "react-icons/ai";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { async } from "@firebase/util";
 
 function Detail(props) {
   const params = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const commentRef = React.useRef(null);
 
@@ -26,6 +32,9 @@ function Detail(props) {
         setUserImageState([...userImageState, doc.data().profilePic]);
       });
     });
+    if (userImageState.length === ReversedData.length) {
+      return false;
+    }
   });
 
   const likePost = async (info) => {
@@ -77,6 +86,11 @@ function Detail(props) {
     dispatch(commentPostFB(commentInfo));
   };
 
+  const deleteThis = (postId) => {
+    dispatch(deletePostFB(postId));
+    navigate("/");
+  };
+
   return (
     <div>
       <Cover>
@@ -106,16 +120,36 @@ function Detail(props) {
                         position: "absolute",
                         width: "20px",
                         height: "20px",
-                        color: props.is_login
-                          ? n.likes.includes(props.auth.currentUser.email)
-                            ? "pink"
-                            : "gray"
-                          : "gray",
+                        color:
+                          props.auth.currentUser !== null
+                            ? n.likes.includes(props.auth.currentUser.email)
+                              ? "pink"
+                              : "gray"
+                            : "gray",
                         bottom: "15px",
                         right: "20px",
                       }}
                     />
                   </PostCover>
+                  {props.auth.currentUser !== null ? (
+                    n.userEmail === props.auth.currentUser.email ? (
+                      <EditCover>
+                        <Link
+                          to={`/edit/${n.id}`}
+                          style={{ display: "contents" }}
+                        >
+                          <EditBtn>수정</EditBtn>
+                        </Link>
+                        <DeleteBtn
+                          onClick={() => {
+                            deleteThis(n.id);
+                          }}
+                        >
+                          삭제
+                        </DeleteBtn>
+                      </EditCover>
+                    ) : null
+                  ) : null}
                   <CommentCover>
                     <CommentInput
                       type="text"
@@ -125,9 +159,9 @@ function Detail(props) {
                     />
                     <CommentBtn onClick={postComment}>댓글달기</CommentBtn>
                   </CommentCover>
-                  {n.comments.map((c) => {
+                  {n.comments.map((c, d) => {
                     return (
-                      <div key={n.id + "comment"}>
+                      <div key={n.id + "comment" + d}>
                         <CommentsCover>
                           <CommentNickname>{c.userNickname}</CommentNickname>
                           <CommentText>{c.text}</CommentText>
@@ -163,16 +197,36 @@ function Detail(props) {
                         position: "absolute",
                         width: "20px",
                         height: "20px",
-                        color: props.is_login
-                          ? n.likes.includes(props.auth.currentUser.email)
-                            ? "pink"
-                            : "gray"
-                          : "gray",
+                        color:
+                          props.auth.currentUser !== null
+                            ? n.likes.includes(props.auth.currentUser.email)
+                              ? "pink"
+                              : "gray"
+                            : "gray",
                         bottom: "15px",
                         right: "20px",
                       }}
                     />
                   </PostCover>
+                  {props.auth.currentUser !== null ? (
+                    n.userEmail === props.auth.currentUser.email ? (
+                      <EditCover>
+                        <Link
+                          to={`/edit/${n.id}`}
+                          style={{ display: "contents" }}
+                        >
+                          <EditBtn>수정</EditBtn>
+                        </Link>
+                        <DeleteBtn
+                          onClick={() => {
+                            deleteThis(n.id);
+                          }}
+                        >
+                          삭제
+                        </DeleteBtn>
+                      </EditCover>
+                    ) : null
+                  ) : null}
                   <CommentCover>
                     <CommentInput
                       type="text"
@@ -182,9 +236,9 @@ function Detail(props) {
                     />
                     <CommentBtn onClick={postComment}>댓글달기</CommentBtn>
                   </CommentCover>
-                  {n.comments.map((c) => {
+                  {n.comments.map((c, d) => {
                     return (
-                      <div key={n.id + "comment"}>
+                      <div key={n.id + "comment" + d}>
                         <CommentsCover>
                           <CommentNickname>{c.userNickname}</CommentNickname>
                           <CommentText>{c.text}</CommentText>
@@ -220,16 +274,36 @@ function Detail(props) {
                         position: "absolute",
                         width: "20px",
                         height: "20px",
-                        color: props.is_login
-                          ? n.likes.includes(props.auth.currentUser.email)
-                            ? "pink"
-                            : "gray"
-                          : "gray",
+                        color:
+                          props.auth.currentUser !== null
+                            ? n.likes.includes(props.auth.currentUser.email)
+                              ? "pink"
+                              : "gray"
+                            : "gray",
                         bottom: "15px",
                         right: "20px",
                       }}
                     />
                   </PostCover>
+                  {props.auth.currentUser !== null ? (
+                    n.userEmail === props.auth.currentUser.email ? (
+                      <EditCover>
+                        <Link
+                          to={`/edit/${n.id}`}
+                          style={{ display: "contents" }}
+                        >
+                          <EditBtn>수정</EditBtn>
+                        </Link>
+                        <DeleteBtn
+                          onClick={() => {
+                            deleteThis(n.id);
+                          }}
+                        >
+                          삭제
+                        </DeleteBtn>
+                      </EditCover>
+                    ) : null
+                  ) : null}
                   <CommentCover>
                     <CommentInput
                       type="text"
@@ -239,9 +313,9 @@ function Detail(props) {
                     />
                     <CommentBtn onClick={postComment}>댓글달기</CommentBtn>
                   </CommentCover>
-                  {n.comments.map((c) => {
+                  {n.comments.map((c, d) => {
                     return (
-                      <div key={n.id + "comment"}>
+                      <div key={n.id + "comment" + d}>
                         <CommentsCover>
                           <CommentNickname>{c.userNickname}</CommentNickname>
                           <CommentText>{c.text}</CommentText>
@@ -407,6 +481,32 @@ const TextFull = styled.p`
   @media screen and (max-width: 500px) {
     width: calc((100% - 60px));
   }
+`;
+
+const EditCover = styled.div`
+  float: right;
+  margin: 10px 30px 10px auto;
+`;
+
+const EditBtn = styled.button`
+  background-color: deepskyblue;
+  color: white;
+  width: 50px;
+  height: 25px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  margin-right: 10px;
+`;
+
+const DeleteBtn = styled.button`
+  background-color: deepskyblue;
+  color: white;
+  width: 50px;
+  height: 25px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
 `;
 
 const Comments = styled.p`

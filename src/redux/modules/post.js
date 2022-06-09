@@ -20,6 +20,7 @@ const CREATE = "post/CREATE";
 const LIKE = "post/LIKE";
 const UNLIKE = "post/UNLIKE";
 const COMMENT = "post/COMMENT";
+const DELETE = "post/DELETE";
 
 const initialState = {
   list: [],
@@ -44,6 +45,10 @@ export function unLikePost(post) {
 
 export function commentPost(commentInfo) {
   return { type: COMMENT, commentInfo };
+}
+
+export function deletePost(postId) {
+  return { type: DELETE, postId };
 }
 
 //middlewares
@@ -141,6 +146,14 @@ export const commentPostFB = (commentInfo) => {
   };
 };
 
+export const deletePostFB = (postId) => {
+  return async function (dispatch, getState) {
+    dispatch(deletePost(postId));
+    const docRef = doc(db, "post", postId);
+    await deleteDoc(docRef);
+  };
+};
+
 // Reducer
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
@@ -180,6 +193,12 @@ export default function reducer(state = initialState, action = {}) {
       };
       temp_post_list[action.commentInfo.index].comments.push(newPush);
       const new_post_list = temp_post_list;
+      return { list: new_post_list };
+    }
+    case "post/DELETE": {
+      const new_post_list = state.list.filter((l) => {
+        return l.id !== action.postId;
+      });
       return { list: new_post_list };
     }
     // do reducer stuff
