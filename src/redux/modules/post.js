@@ -74,11 +74,22 @@ export const createPostFB = (post) => {
       const my_id = doc.id;
       id_list.push(+my_id.split("a")[1]);
     });
-    const this_id = Math.max(...id_list) + 1;
+    const this_id = String(Math.max(...id_list) + 1).padStart(4, "0");
     const docRef = await setDoc(doc(db, "post", `a${this_id}`), {
       ...post,
     });
-    dispatch(createPost(post));
+    const newPost = {
+      id: "a" + this_id,
+      imageUrl: post.imageUrl,
+      imageStyle: post.imageStyle,
+      text: post.text,
+      userEmail: post.userEmail,
+      userNickname: post.userNickname,
+      time: post.time,
+      likes: post.likes,
+      comments: post.comments,
+    };
+    dispatch(createPost(newPost));
   };
 };
 
