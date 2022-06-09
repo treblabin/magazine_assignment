@@ -11,7 +11,6 @@ import { collection, getDocs, where, query } from "firebase/firestore";
 import { db } from "./shared/firebase";
 import { AiFillHeart } from "react-icons/ai";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { async } from "@firebase/util";
 
 function Detail(props) {
   const params = useParams();

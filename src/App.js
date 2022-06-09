@@ -192,6 +192,17 @@ const UpButton = styled.button`
   border-radius: 20px;
   float: right;
   margin: 30px 30px 0px 0px;
+  @media screen and (max-width: 350px) {
+    width: calc(100vw - 250px);
+  }
+  @media screen and (max-width: 320px) {
+    width: calc(100vw - 250px);
+    font-size: 10px;
+  }
+  @media screen and (max-width: 300px) {
+    width: 50px;
+    font-size: 10px;
+  }
 `;
 
 export default App;

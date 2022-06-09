@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { auth, db } from "./shared/firebase";
+import { useDispatch } from "react-redux";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 function Signup() {
   const emailRef = React.useRef(null);
@@ -10,11 +12,20 @@ function Signup() {
   const nicknameRef = React.useRef(null);
   const passwordCheckRef = React.useRef(null);
 
-  const navigate = useNavigate();
+  const [passwordLengthState, setPasswordLengthState] = useState(0);
+  const [passwordCheckLengthState, setPasswordCheckLengthState] = useState(0);
+  const [passwordState, setPasswordState] = useState(null);
+  const [passwordCheckState, setPasswordCheckState] = useState(null);
 
-  window.addEventListener("keydown", (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  window.addEventListener("keyup", (e) => {
     if (e.key === "Enter") {
       signupFB();
+    }
+    if (passwordRef.current !== null) {
+      dispatch(setPasswordLengthState(passwordRef.current.value.length));
     }
   });
 
@@ -110,24 +121,124 @@ function Signup() {
 
   return (
     <div>
-      아이디(이메일) : <input type="text" ref={emailRef} /> <br />
-      닉네임 : <input type="text" id="nickname" ref={nicknameRef} />
-      <button onClick={checkNickname} id="checkNickname">
-        닉네임 중복체크
-      </button>
-      <button
-        onClick={changeNickname}
-        id="changeNickname"
-        style={{ display: "none" }}
-      >
-        닉네임 수정하기
-      </button>
-      <br />
-      비밀번호 : <input type="password" ref={passwordRef} /> <br />
-      비밀번호 확인 : <input type="password" ref={passwordCheckRef} /> <br />
-      <button onClick={signupFB}>회원가입하기</button>
+      <GiveMargin />
+      <Cover>
+        <div />
+        <Title>회원가입</Title>
+        <div />
+        <div />
+        아이디(이메일) :
+        <div />
+        <div />
+        <MyInput type="text" ref={emailRef} />
+        <div />
+        <div />
+        닉네임 :
+        <div />
+        <div />
+        <MyInput type="text" id="nickname" ref={nicknameRef} />
+        <NicknameBtn onClick={checkNickname} id="checkNickname">
+          중복체크
+        </NicknameBtn>
+        <NicknameBtn
+          onClick={changeNickname}
+          id="changeNickname"
+          style={{ display: "none" }}
+        >
+          수정하기
+        </NicknameBtn>
+        <div />
+        비밀번호 :
+        <div />
+        <div />
+        <MyInput type="password" ref={passwordRef} />
+        <PasswordBtn
+          style={{ backgroundColor: passwordLengthState > 5 ? "green" : "red" }}
+        >
+          {passwordLengthState > 5 ? "유효" : "무효"}
+        </PasswordBtn>
+        <div />
+        비밀번호 확인 :
+        <div />
+        <div />
+        <MyInput type="password" ref={passwordCheckRef} />
+        <div />
+        <div />
+        <SignBtn onClick={signupFB}>회원가입하기</SignBtn>
+      </Cover>
     </div>
   );
 }
+
+const GiveMargin = styled.div`
+  height: 10vh;
+`;
+
+const Cover = styled.div`
+  width: calc((100vw - 40px));
+  height: 100%;
+  max-width: 500px;
+  margin: auto;
+  text-align: center;
+  display: grid;
+  grid-template-columns: 2fr 4fr 2fr;
+  gap: 0px 10px;
+  padding: 20px;
+`;
+
+const Title = styled.p`
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const MyInput = styled.input`
+  height: 25px;
+  outline-color: deepskyblue;
+  border: 2px solid deepskyblue;
+  border-radius: 10px;
+  margin-bottom: 10px;
+`;
+
+const NicknameBtn = styled.button`
+  background-color: deepskyblue;
+  color: white;
+  height: 30px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  @media screen and (max-width: 380px) {
+    font-size: 12px;
+  }
+  @media screen and (max-width: 350px) {
+    font-size: 10px;
+  }
+`;
+
+const PasswordBtn = styled.button`
+  color: white;
+  height: 30px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  @media screen and (max-width: 380px) {
+    font-size: 12px;
+  }
+  @media screen and (max-width: 350px) {
+    font-size: 10px;
+  }
+`;
+
+const SignBtn = styled.button`
+  margin-top: 30px;
+  background-color: deepskyblue;
+  color: white;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+`;
 
 export default Signup;
